@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>2G_3G_Throughput_Volume_day</title>
+	
+	<!-- Bootstrap -->
+	<link href="../src/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+	<link href="../src/nvd3/nv.d3.css" rel="stylesheet" type="text/css">  <!-- this does some formatting on the actual graph and the tooltips-->
+	<link href="../src/nvd3/test/teststyle.css" rel="stylesheet"> <!--this does the class = chart half part, it also does some formatting on the tool tips  also the location--> 
+	
+	<!-- used for the sub-dropdown menu/navbar-->
+	<link href="../src/Style/sub_menu.css" rel="stylesheet">
+
+<!--[if IE]><p class="rejectionalert" style="background-color:#B22222; height:100px;"><span>Your Internet Explorer will probably not work as intended</span> - upgrade to something better like: <a href='http://getfirefox.com' target="_blank">FireFox</a>, <a href='https://www.google.com/intl/en/chrome/' target="_blank">Chrome</a> or <a href='http://www.apple.com/safari/' target="_blank">Safari</a></p><![endif]-->
+
+<!--START: Google Analytics ga.js --->
+<script type="text/javascript" src="../src/goog/ga.js"></script>
+<!--END: Google Analytics ga.js --->
+</head>
+<body>	
+
+
+<!-- START OF: Bootstrap Nav Bar -->
+<script type="text/javascript" src="../src/Style/menu.js"></script>
+<!-- END OF: Bootstrap Nav Bar -->
+
+
+	<div class="container" id="graphs">
+					
+	<!-- My divs will go here -->
+	</div>
+	
+	<!-- Footer part for bottom of screen-->
+	<div class="navbar-fixed-bottom col-xs-2">
+		<a id='filterDiv'></a>
+	</div>
+
+	<!-- Footer part at bottom of page-->
+	<div id="footer">
+       <div class="row col-md-2 col-md-offset-5">
+			
+		<p class="text-muted">&copy; 2014. Core Team</p>
+      </div>
+
+		<div id="downloadlinks">
+		<!-- this is what i am trying to automate/multle times-->
+		<!--<a href="UMTS_Cell_Day(partB).csv"
+		class="glyphicon glyphicon-download-alt text-muted">
+		</a>
+		<a href="UMTS_Cell_Day(partB).csv"
+		class="glyphicon glyphicon-download-alt text-muted">
+		</a>
+		<a href="UMTS_Cell_Day(partB).csv"
+		class="glyphicon glyphicon-download-alt text-muted">
+		</a> --> 
+		</div>
+
+			
+	
+    </div>
+	
+	<!-- Bootstrap -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="../src/jquery-1.11.0.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../src/bootstrap/js/bootstrap.min.js"></script>
+	
+	<!-- nvd3 -->
+	<script src="../src/nvd3/lib/d3.v3.js"></script>
+	<script src="../src/nvd3/nv.d3.js"></script>
+	<script src="../src/nvd3/src/tooltip.js"></script>
+	<script src="../src/nvd3/src/utils.js"></script>
+	<script src="../src/nvd3/src/interactiveLayer.js"></script>
+	<script src="../src/nvd3/src/models/legend.js"></script>
+	<script src="../src/nvd3/src/models/axis.js"></script>
+	<script src="../src/nvd3/src/models/scatter.js"></script>
+	<script src="../src/nvd3/src/models/line.js"></script>
+	<script src="../src/nvd3/src/models/lineChart.js"></script>
+	<script src="../src/nvd3/src/models/linePlusBarChart.js"></script>
+	<script src="../src/nvd3/src/models/stackedAreaChart.js"></script>
+	<script src="../src/Style/getData.js"></script><!--this is PLs lbraray for getting the csv data -->
+
+<script>
+
+//***************************START:DefineCharts***************************//
+/* Counters of interest...
+**NOTE average here PRS sums up the hourly values **
+
+
+"Gn peak throughput in Mbps(Mbit/s)"
+"Gn Peak DL Throughput Mbps(Mbit/s)"
+"Gn Peak UL Throughput Mbps(Mbit/s)"
+"Gn downlink average throughput in Mbps(Mbit/s)"
+"Gn uplink average throughput in Mbps(Mbit/s)"
+"Gn downlink traffic in GB"
+"Gn uplink traffic in GB"
+"Gi peak throughput in Mbps(Mbit/s)"
+"Gi Peak DL Throughput Mbps(Mbit/s)"
+"Gi Peak UL Throughput Mbps(Mbit/s)"
+"Gi downlink average throughput in Mbps(Mbit/s)"
+"Gi uplink average throughput in Mbps(Mbit/s)"
+"Gi downlink traffic in GB"
+"Gi uplink traffic in GB"
+
+
+
+
+*/
+
+var charts = [
+{name:"chart1", 
+type:"lineWithFocusChart", // "lineChart",//"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[0,0],  
+decimal:',.f', 
+//threshold: {val:'50',key:'SomeName'}, 
+chType:'object', 
+kpi:["Gn peak throughput in Mbps(Mbit/s)",
+"Gi peak throughput in Mbps(Mbit/s)"]//,'Attach request Times':'bar'  // add this for "lineChart" 
+},
+{name:"chart2", 
+type:"lineWithFocusChart", // "lineChart",//"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[0,0],  
+decimal:',.f', 
+chType:'metric', 
+kpi:[
+"Gi peak throughput in Mbps(Mbit/s)"
+]
+},
+{name:"chart3", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[0,0],  
+decimal:',.f', 
+chType:'object', 
+kpi:[
+"Gn Peak DL Throughput Mbps(Mbit/s)",
+"Gn Peak UL Throughput Mbps(Mbit/s)"
+]
+},
+{name:"chart4", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[0,0],  
+decimal:',.f', 
+chType:'object', 
+kpi:[
+"Gn downlink traffic in GB",
+"Gn uplink traffic in GB"
+]
+},
+{name:"chart5", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[0,0], 
+decimal:',.f', 
+chType:'object', 
+kpi:[
+"Gi Peak DL Throughput Mbps(Mbit/s)",
+"Gi Peak UL Throughput Mbps(Mbit/s)"
+]
+},
+{name:"chart6", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[0,0], 
+decimal:',.f', 
+chType:'object', 
+kpi:[
+"Gi downlink traffic in GB",
+"Gi uplink traffic in GB"
+]
+},
+{name:"chart7", 
+type:"linePlusBarChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[98,100],
+//yDomain:[90,100],  
+decimal:',.f', 
+//threshold: {val:'99',key:'AOG SLA'}, 
+chType:'object', 
+kpi:["Gn Peak DL Throughput Mbps(Mbit/s)",
+"Gn downlink traffic in GB"],"Gn downlink traffic in GB":'bar'  // add this for "linePlusBarChart" 
+},
+{name:"chart8", 
+type:"linePlusBarChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[0,0],
+//yDomain:[90,100],  
+decimal:',.f', 
+//threshold: {val:'99',key:'AOG SLA'}, 
+chType:'object', 
+kpi:["Gn Peak UL Throughput Mbps(Mbit/s)",
+"Gn uplink traffic in GB"] ,"Gn uplink traffic in GB":'bar'
+}];
+//***************************END:DefineCharts***************************//
+
+   $(document).ready(function(){
+   
+    //change the title of the page 
+	document.title = "2G_3G_Throughput_Volume_day";
+	
+ 	//--------- START: Draw all your divs------------------------------------------>
+	var numberOfDivs =8; 
+    
+    for (var x = 1; x <= numberOfDivs; x += 1) {
+    var $div = $('<div class="chart half"><h3 id="g' + x + '">Graph' + x + '</h3><svg id="chart' + x + '"></svg></div>');
+		
+		//create a divider 
+		//alert(x);
+		//if(x===9){
+		// $('#graphs').append('<h1>Metric Graph Examples ----------------------------------------\></h1>');
+		//}
+		if (x===1 || x ===2 ) { // this will be a full width graph 
+			var $div = $('<div class="chart full"><h3 id="g' + x + '">Graph' + x + '</h3><svg id="chart' + x + '"></svg></div>');
+			$('#graphs').append($div);
+		//} else if (x===2) { 
+			// do nothing 
+		} else {  // this will be a half width graph 
+			$('#graphs').append($div);
+		}
+			
+        
+    }
+	//--------- END: Draw all your divs------------------------------------------>
+	
+	//--------- START: add your download file html------------------------------------------>
+    //file that feed graphs
+	var files4download = ["../../reports/LTE_day_2(LTE_Volume_and_Throughput).csv"]; //0,1,2
+		
+    for (var i = 0; i<files4download.length; i++) {
+    var $div2 = $('<a href=' +  files4download[i] + ' class="glyphicon glyphicon-download-alt text-muted"></a>');
+	//$('.navbar-fixed-bottom col-xs-2').append($div2); //using the class does not work
+	$('#downloadlinks').append($div2);
+	}
+	//--------- END: add your download file html------------------------------------------->
+	
+	//**************************** START: DrawCharts ******************************//
+	//object charts
+	var myStartThis = new StartThis();  
+	myStartThis.set("cb",myCallBack); 
+	myStartThis.set("charts",charts); 
+	myStartThis.set("dropDownDomID","filterDiv"); 
+	myStartThis.set("dropDownStyle",{'class':'form-control'}); 
+	//myStartThis.set("csv_file","../../reports/LTE_hour(Untitled_113).csv");
+	myStartThis.set("csv_file",files4download[0]); //adding a varialbe
+	myStartThis.getMyData();
+	
+	//metric charts
+	//**************************** START: DrawCharts ******************************//
+	
+   //--------- START: Declare graph titles------------------------------------------>	
+   var gt1 = "Gi/Gn Peak Throughput(Mbit/s)";
+   var gt2 = "Gi peak throughput in Mbps(Mbit/s) per GG";
+   var gt3 = "Gn DL/UL Peak/Average (Mbit/s)";
+   var gt4 = "Gn DL/UL traffic in GB";
+   var gt5 = "Gi DL/UL Peak/Average (Mbit/s)";
+   var gt6 = "Gi DL/UL traffic in GB";
+   var gt7 = "Gn DL peak Tput & Vol";
+   var gt8 = "Gn UL peak Tput & Vol";
+   /*var gt9 = "SGW S1-U DL Peak Mbps(Mbit/s)";
+   var gt10 = ""; // "SGW S1-U UL Peak Mbps(Mbit/s)";
+   var gt11 = ""; // "SGW S1-U DL Peak Mbps(Mbit/s)";
+   var gt12 = ""; // "SGW S1-U UL Peak Mbps(Mbit/s)";
+   var gt13 = ""; // "SGW S1-U DL Peak Mbps(Mbit/s)";
+   var gt14 = ""; // "SGW S1-U UL Peak Mbps(Mbit/s)";
+   var gt15 = ""; // "SGW S1-U DL Peak Mbps(Mbit/s)";
+   var gt16 = ""; // "SGW S1-U UL Peak Mbps(Mbit/s)";
+   */
+   //--------- END: Declare graph titles  ------------------------------------------>	
+   
+   //--------- START: change graph titles------------------------------------------>	
+   $('#g1').text(gt1);
+   $('#g2').text(gt2);
+   $('#g3').text(gt3);
+   $('#g4').text(gt4);
+   $('#g5').text(gt5);
+   $('#g6').text(gt6);
+   $('#g7').text(gt7);
+   $('#g8').text(gt8);
+   /*$('#g9').text(gt9);
+   $('#g10').text(gt10);
+   $('#g11').text(gt11);
+   $('#g12').text(gt12);
+   $('#g13').text(gt13);
+   $('#g14').text(gt14);
+   $('#g15').text(gt15);
+   $('#g16').text(gt16);
+   */
+	//--------- END: change graph titles  ------------------------------------------>	
+
+	});
+
+</script>
+
+<!--START: Google Analytics --->
+<script type="text/javascript"
+src="../src/goog/ga_body.js"></script>
+<!--END: Google Analytics --->
+</body>
+</html>

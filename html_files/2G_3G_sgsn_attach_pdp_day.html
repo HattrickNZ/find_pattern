@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>2G_3G_Overview_Dashboard_week.html</title>
+	
+	<!-- Bootstrap -->
+	<link href="../src/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+	<link href="../src/nvd3/nv.d3.css" rel="stylesheet" type="text/css">  <!-- this does some formatting on the actual graph and the tooltips-->
+	<link href="../src/nvd3/test/teststyle.css" rel="stylesheet"> <!--this does the class = chart half part, it also does some formatting on the tool tips  also the location--> 
+	
+	<!-- used for the sub-dropdown menu/navbar-->
+	<link href="../src/Style/sub_menu.css" rel="stylesheet">
+
+<!--[if IE]><p class="rejectionalert" style="background-color:#B22222; height:100px;"><span>Your Internet Explorer will probably not work as intended</span> - upgrade to something better like: <a href='http://getfirefox.com' target="_blank">FireFox</a>, <a href='https://www.google.com/intl/en/chrome/' target="_blank">Chrome</a> or <a href='http://www.apple.com/safari/' target="_blank">Safari</a></p><![endif]-->
+<!--START: Google Analytics ga.js --->
+<script type="text/javascript" src="../src/goog/ga.js"></script>
+<!--END: Google Analytics ga.js --->
+</head>
+<body>	
+
+<!-- START OF: Bootstrap Nav Bar -->
+<script type="text/javascript" src="../src/Style/menu.js"></script>
+<!-- END OF: Bootstrap Nav Bar -->
+
+	<div class="container" id="graphs">
+					
+	<!-- My divs will go here -->
+	</div>
+	
+	<!-- Footer part for bottom of screen-->
+	<div class="navbar-fixed-bottom col-xs-2" >
+		<a id='filterDiv'></a>
+	</div>
+
+	<!-- Footer part at bottom of page-->
+	<div id="footer">
+       <div class="row col-md-2 col-md-offset-5">
+			
+		<p class="text-muted">&copy; 2014. Core Team</p>
+      </div>
+
+		<div id="downloadlinks">
+		<!-- this is what i am trying to automate/multle times-->
+		<!--<a href="UMTS_Cell_Day(partB).csv"
+		class="glyphicon glyphicon-download-alt text-muted">
+		</a>
+		<a href="UMTS_Cell_Day(partB).csv"
+		class="glyphicon glyphicon-download-alt text-muted">
+		</a>
+		<a href="UMTS_Cell_Day(partB).csv"
+		class="glyphicon glyphicon-download-alt text-muted">
+		</a> --> 
+		</div>
+    </div>
+	
+	<!-- Bootstrap -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="../src/jquery-1.11.0.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../src/bootstrap/js/bootstrap.min.js"></script>
+	
+	<!-- nvd3 -->
+	<script src="../src/nvd3/lib/d3.v3.js"></script>
+	<script src="../src/nvd3/nv.d3.js"></script>
+	<script src="../src/nvd3/src/tooltip.js"></script>
+	<script src="../src/nvd3/src/utils.js"></script>
+	<script src="../src/nvd3/src/interactiveLayer.js"></script>
+	<script src="../src/nvd3/src/models/legend.js"></script>
+	<script src="../src/nvd3/src/models/axis.js"></script>
+	<script src="../src/nvd3/src/models/scatter.js"></script>
+	<script src="../src/nvd3/src/models/line.js"></script>
+	<script src="../src/nvd3/src/models/lineChart.js"></script>
+	<script src="../src/nvd3/src/models/linePlusBarChart.js"></script>
+	<script src="../src/nvd3/src/models/stackedAreaChart.js"></script>
+	<script src="../src/Style/getData.js"></script><!--this is PLs lbraray for getting the csv data -->
+
+<script>
+
+//***************************START:DefineCharts***************************//
+/* Counters of interest...
+@oss1:~/public_html/csv$ cat LTE_day\(USN_Gb_Iu_Att_PDP_day\).csv  | head -n 1 | tr ',' '\n'
+"Time"
+"Object"
+"Integrity"
+"Gb mode maximum attached users(number)"
+"Gb mode maximum users with act PDP context(number)"
+"Iu mode maximum attached users(number)"
+"Iu mode maximum users with active PDP context(number)"
+"Maximum attached users(number)"
+"Maximum PDN connection number(number)"
+"Maximum dedicated bearer number(number)"
+"Maximum attached users at ECM-CONNECTED status(number)"
+"Maximum attached users at ECM-IDLE status(number)"
+
+
+
+*/
+
+var charts = [
+{name:"chart1", 
+type:"lineChart",//"linePlusBarChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[0,1], 
+decimal:',.f', 
+chType:'metric', 
+//threshold: {val:'0.5',key:'Target'}, 
+kpi:['Gb mode maximum attached users(number)']//,'Attach request Times':'bar'  // add this for "linePlusBarChart" 
+},
+{name:"chart2", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[90,100],
+//yDomain:[98,100],  
+decimal:',.f', 
+chType:'metric',
+//threshold: {val:'95',key:'Target'},  
+kpi:[
+'Gb mode maximum users with act PDP context(number)']
+},
+{name:"chart3", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[90,100],
+//yDomain:[98,100],  
+decimal:',.f', 
+chType:'metric',
+//threshold: {val:'95',key:'Target'},  
+kpi:[
+'Iu mode maximum attached users(number)']
+},
+{name:"chart4", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[90,100],
+//yDomain:[98,100],  
+decimal:',.f', 
+chType:'metric',
+//threshold: {val:'95',key:'Target'},  
+kpi:[
+'Iu mode maximum users with active PDP context(number)']
+},
+{name:"chart5", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[90,100],
+//yDomain:[98,100],  
+decimal:',.f', 
+chType:'metric',
+//threshold: {val:'95',key:'Target'},  
+kpi:[
+'Maximum attached users(number)']
+},
+{name:"chart6", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[90,100],
+//yDomain:[98,100],  
+decimal:',.f', 
+chType:'metric',
+//threshold: {val:'95',key:'Target'},  
+kpi:[
+'Maximum PDN connection number(number)']
+}
+];
+
+
+
+
+
+
+/*
+var charts2 = [
+{name:"chart3", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[90,100], 
+yDomain:[90,100], 
+decimal:',.f', 
+chType:'metric', 
+threshold: {val:'95',key:'Target'}, 
+kpi:[
+'Iu mode MS init PDP context act success ratio(%)',
+]
+},
+{name:"chart4", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[90,100], 
+decimal:',.f', 
+chType:'metric', 
+threshold: {val:'95',key:'Target'}, 
+kpi:[
+'Gb mode MS init PDP context act success ratio_sk',
+]
+}];
+var charts3 = [
+{name:"chart5", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[60,100], 
+decimal:',.f', 
+chType:'metric', 
+threshold: {val:'65',key:'Target'},  
+kpi:[
+'Iu Mode GPRS Attach Success Rate_sk'
+]
+},
+{name:"chart6", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[60,100], 
+decimal:',.f', 
+chType:'metric', 
+threshold: {val:'65',key:'Target'},  
+kpi:[
+'Gb mode GPRS Attach Success Rate_sk'
+]
+}];
+var charts4 = [
+{name:"chart7", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[98,100],
+yDomain:[90,100],  
+decimal:',.f', 
+threshold: {val:'99',key:'Target'}, 
+chType:'metric', 
+kpi:[
+'Iu mode packet paging success ratio(%)'
+]
+},
+{name:"chart8", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[100,98],
+yDomain:[90,100],  
+decimal:',.f', 
+threshold: {val:'99',key:'Target'}, 
+chType:'metric', 
+kpi:[
+'Gb mode packet paging success ratio(%)'
+]
+}];
+var charts5 = [
+{name:"chart9", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[90,100], 
+yDomain:[85,100], 
+decimal:',.f', 
+chType:'metric', 
+threshold: {val:'90',key:'Target'},  
+kpi:[
+'3G_OverallPagingSR%_sk'
+]
+},
+{name:"chart10", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[90,100], 
+yDomain:[85,100], 
+decimal:',.f', 
+threshold: {val:'90',key:'Target'}, 
+chType:'metric', 
+kpi:[
+'2G_Overall_PagingSR%_sk'
+]
+}];
+var charts6 = [
+{name:"chart11", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[80,100],
+yDomain:[80,100], 
+decimal:',.f', 
+chType:'metric', 
+threshold: {val:'95',key:'Target'}, 
+kpi:[
+'MO SMS Success Ratio(%)'
+]
+},
+{name:"chart12", 
+type:"lineChart", 
+height:400, 
+margin:{top:30,right:50,bottom:50,left:100}, 
+forceY:[80,100], 
+yDomain:[80,100], 
+decimal:',.f', 
+chType:'metric', 
+threshold: {val:'95',key:'Target'}, 
+kpi:[
+'MT SMS Success Ratio(%)'
+]
+}
+];
+*/
+//***************************END:DefineCharts***************************//
+
+   $(document).ready(function(){
+   
+    //change the title of the page 
+	document.title = "2G_3G_sgsn_attach_pdp_day";
+   
+ 	//--------- START: Draw all your divs------------------------------------------>
+	var numberOfDivs =6; 
+    
+    for (var x = 1; x <= numberOfDivs; x += 1) {
+    var $div = $('<div class="chart half"><h3 id="g' + x + '">Graph' + x + '</h3><svg id="chart' + x + '"></svg></div>');
+     
+        $('#graphs').append($div);
+    }
+	//--------- END: Draw all your divs------------------------------------------>
+	
+	//--------- START: add your download file html---------------------------------------->
+    //file that feed graphs
+	var files4download = ["../../reports/LTE_day_2(USN_Gb_Iu_Att_PDP_day).csv"]; //0,1,2
+		
+    for (var i = 0; i<files4download.length; i++) {
+    var $div2 = $('<a href=' +  files4download[i] + ' class="glyphicon glyphicon-download-alt text-muted"></a>');
+	//$('.navbar-fixed-bottom col-xs-2').append($div2); //using the class does not work
+	$('#downloadlinks').append($div2);
+	}
+	//--------- END: add your download file html------------------------------------------->
+	
+	//**************************** START: DrawCharts ******************************//
+	var myStartThis = new StartThis();  
+	myStartThis.set("cb",myCallBack); 
+	myStartThis.set("charts",charts); 
+	//myStartThis.set("dropDownDomID","filterDiv"); 
+	//myStartThis.set("dropDownStyle",{'class':'form-control'}); 
+	myStartThis.set("csv_file",files4download[0]);
+	myStartThis.getMyData();
+	
+	/*
+	var myStartThis2 = new StartThis();  
+	myStartThis2.set("cb",myCallBack); 
+	myStartThis2.set("charts",charts2); 
+	myStartThis2.set("csv_file",files4download[1]);
+	myStartThis2.getMyData();
+
+	var myStartThis3 = new StartThis();  
+	myStartThis3.set("cb",myCallBack); 
+	myStartThis3.set("charts",charts3); 
+	myStartThis3.set("csv_file",files4download[2]);
+	myStartThis3.getMyData();
+	
+	var myStartThis4 = new StartThis();  
+	myStartThis4.set("cb",myCallBack); 
+	myStartThis4.set("charts",charts4); 
+	myStartThis4.set("csv_file",files4download[3]);
+	myStartThis4.getMyData();
+	
+	var myStartThis5 = new StartThis();  
+	myStartThis5.set("cb",myCallBack); 
+	myStartThis5.set("charts",charts5); 
+	myStartThis5.set("csv_file",files4download[4]);
+	myStartThis5.getMyData();
+	
+	var myStartThis6 = new StartThis();  
+	myStartThis6.set("cb",myCallBack); 
+	myStartThis6.set("charts",charts6); 
+	myStartThis6.set("csv_file",files4download[5]);
+	myStartThis6.getMyData();
+	*/
+	
+	//**************************** START: DrawCharts ******************************//
+	
+   //--------- START: Declare graph titles------------------------------------------>	
+   var gt1 = "Gb mode maximum attached users(number)";
+   var gt2 = "Gb mode maximum users with act PDP context(number)";
+   var gt3 = "Iu mode maximum attached users(number)";
+   var gt4 = "Iu mode maximum users with active PDP context(number)";
+   var gt5 = "LTE Maximum attached users(number)";
+   var gt6 = "LTE Maximum PDN connection number(number)";
+   /*
+   var gt7 = "Iu mode packet paging success ratio(%)";
+   var gt8 = "Gb mode packet paging success ratio(%)";
+   var gt9 = "Iu CS Paging success ratio(%)";
+   var gt10 = "Gb CS Paging success ratio(%)";
+   var gt11 = "MO SMS Success Ratio(%)";
+   var gt12 = "MT SMS Success Ratio(%)";
+   */
+   //--------- END: Declare graph titles  ------------------------------------------>	
+   
+   //--------- START: change graph titles------------------------------------------>	
+   $('#g1').text(gt1);
+   $('#g2').text(gt2);
+   $('#g3').text(gt3);
+   $('#g4').text(gt4);
+   $('#g5').text(gt5);
+   $('#g6').text(gt6);
+   /*
+   $('#g7').text(gt7);
+   $('#g8').text(gt8);
+   $('#g9').text(gt9);
+   $('#g10').text(gt10);
+   $('#g11').text(gt11);
+   $('#g12').text(gt12);
+   */
+	//--------- END: change graph titles  ------------------------------------------>	
+
+	});
+
+</script>
+
+<!-- Start of StatCounter Code for DoYourOwnSite -->
+<script type="text/javascript">
+var sc_project=9633857; 
+var sc_invisible=1; 
+var sc_security="4976e864"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost+
+"statcounter.com/counter/counter.js'></"+"script>");
+</script>
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/free-hit-counter/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/9633857/0/4976e864/1/"
+alt="free hit counters"></a></div></noscript>
+<!-- End of StatCounter Code for DoYourOwnSite -->
+
+<!--START: Google Analytics --->
+<script type="text/javascript"
+src="../src/goog/ga_body.js"></script>
+<!--END: Google Analytics --->
+</body>
+</html>
