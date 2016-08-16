@@ -1,0 +1,11 @@
+<!-- Footer part at bottom of page-->
+<div id="footer">
+   <div class="row col-md-2 col-md-offset-5">
+
+    <p class="text-muted">&copy; 2014. Core Team</p>
+  </div>
+
+    <div id="downloadlinks">
+    <!-- downloadlinks go here-->
+    </div>
+</div>
