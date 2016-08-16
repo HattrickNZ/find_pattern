@@ -1,11 +1,20 @@
-<!-- Footer part at bottom of page-->
-<div id="footer">
-   <div class="row col-md-2 col-md-offset-5">
+	<!-- Footer part at bottom of page-->
+	<div id="footer">
+       <div class="row col-md-2 col-md-offset-5">
+			
+		<p class="text-muted">&copy; 2014. Core Team</p>
+      </div>
 
-    <p class="text-muted">&copy; 2014. Core Team</p>
-  </div>
-
-    <div id="downloadlinks">
-    <!-- downloadlinks go here-->
+		<div id="downloadlinks">
+		<!-- this is what i am trying to automate/multle times-->
+		<!--<a href="UMTS_Cell_Day(partB).csv"
+		class="glyphicon glyphicon-download-alt text-muted">
+		</a>
+		<a href="UMTS_Cell_Day(partB).csv"
+		class="glyphicon glyphicon-download-alt text-muted">
+		</a>
+		<a href="UMTS_Cell_Day(partB).csv"
+		class="glyphicon glyphicon-download-alt text-muted">
+		</a> --> 
+		</div>
     </div>
-</div>
